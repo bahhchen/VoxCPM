@@ -130,14 +130,8 @@ def voxcpm_example():
     # sf.write("output.wav", wav, model.tts_model.sample_rate)
     # print("saved: output.wav")
 
-
-    txt_contents = [
-        'Speaker YM_woman: 波奇酱你搁这儿呢啊! 虽然不知道你咋整的, 我还是买了一裤兜子甜水呢! 卧槽! 撩了的吉他小妹儿! 喜多, 你怎么搁这儿呢?',
-        'Speaker YM_woman: 卧槽! 这谁啊?',
-        'Speaker ZL2_woman: 别整那些没用的了!',
-    ]
     txt_contents = read_txt_speaker_paragraphs("./chh/books/1996 终极实验 - 罗伯特·索耶 - fix/0004.1996 终极实验 - 罗伯特·索耶.引子.txt")
-    inference_zero_shot(model, txt_contents, g_prompts, './chh/output/引子.wav')
+    inference_zero_shot(model, txt_contents, g_prompts, './chh/output/1996 终极实验 - 罗伯特·索耶/0004.引子.wav')
 
 def main():
     voxcpm_example()
