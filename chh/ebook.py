@@ -289,10 +289,11 @@ def to_txt(file_path, txt_dir):
         text = content.replace("○", "零")
         
         safe_title = safe_filename(title)
-        segments = split_text_by_length(text)
+        segments = [] #split_text_by_length(text)
         if len(segments) > 1:
             for j, p in enumerate(segments, 1):
-                txt_content = f"Speaker 1: 第 {i} 章 第 {j} 节 \n{p}"
+                # txt_content = f"Speaker 1: 第 {i} 章 第 {j} 节 \n{p}"
+                txt_content = f"第 {i} 章 第 {j} 节 \n{p}"
                 txt_filename = f"{i:04d}.{j:02d}.{filename}.{safe_title}"
 
                 output_path = os.path.join(output_dir, f"{txt_filename}.txt")
@@ -300,7 +301,8 @@ def to_txt(file_path, txt_dir):
                     f.write(txt_content)
 
         else:
-            txt_content = f"Speaker 1: 第 {i} 章 {safe_title} \n{text}"
+            # txt_content = f"Speaker 1: 第 {i} 章 {safe_title} \n{text}"
+            txt_content = f"第 {i} 章 {safe_title} \n{text}"
             txt_filename = f"{i:04d}.{filename}.{safe_title}"
 
             output_path = os.path.join(output_dir, f"{txt_filename}.txt")
@@ -309,4 +311,5 @@ def to_txt(file_path, txt_dir):
 
 # 示例调用
 if __name__ == "__main__":
-    to_txt("./books/1996 终极实验 - 罗伯特·索耶.epub", "./books/")
+    # to_txt("./books/1996 终极实验 - 罗伯特·索耶.epub", "./books/")
+    to_txt("./books/时间回旋三部曲.mobi", "./books/")
