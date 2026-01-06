@@ -2,3 +2,15 @@ launch.json
 __pycache__
 voxcpm.egg-info
 .DS_Store
+
+# train/inference files
+*.wav
+*.m4a
+*.aac
+*.pt
+
+# chh files
+chh/books/*
+chh/pretrained_models/*
+chh/modelscope/*
+chh/output/*
