@@ -235,6 +235,10 @@ def split_text_by_length(text, max_len=7200):
             newline_pos = text.rfind("\n", 0, split_pos)
             if newline_pos != -1:
                 split_pos = newline_pos + 1  # 包含换行符
+            else:
+                newline_pos = text.rfind("。", 0, split_pos)
+                if newline_pos != -1:
+                    split_pos = newline_pos + 1  # 包含换行符
         
         # 切分
         segment = text[start:split_pos].strip()
@@ -311,5 +315,5 @@ def to_txt(file_path, txt_dir):
 
 # 示例调用
 if __name__ == "__main__":
-    # to_txt("./books/1996 终极实验 - 罗伯特·索耶.epub", "./books/")
-    to_txt("./books/时间回旋三部曲.mobi", "./books/")
+    to_txt("./books/终极实验.epub", "./books/")
+    # to_txt("./books/时间回旋三部曲.mobi", "./books/")

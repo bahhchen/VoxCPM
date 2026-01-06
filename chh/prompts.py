@@ -54,3 +54,32 @@ prompts = {
         'prompt_text' : '剧情就是我饰演的，叫王多鱼，他是一个三四线城市，就是咱们说的西虹市。'
     },
 }
+
+import re
+def read_txt_speaker_paragraphs(file_path):
+    """
+    读取 TXT 文件，将段落按 speaker 
+    """
+    paragraphs = []
+    speaker_pattern = re.compile(r'^Speaker\s*\S*:')  # 匹配 Speaker namexxx:
+
+    with open(file_path, "r", encoding="utf-8-sig") as f:
+        noSpeaker = []
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue  # 忽略空行
+
+            if speaker_pattern.match(line):
+                if len(noSpeaker) > 0:
+                    paragraphs.append("。".join(noSpeaker))
+                # 新段落
+                paragraphs.append(line)
+                noSpeaker = []
+            else:
+                noSpeaker.append(line)
+
+        if len(noSpeaker) > 0:
+            paragraphs.append("。".join(noSpeaker))
+
+    return paragraphs

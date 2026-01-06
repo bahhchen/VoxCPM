@@ -147,6 +147,7 @@ class VoxCPM:
             retry_badcase_max_times : int = 3,
             retry_badcase_ratio_threshold : float = 6.0,
             streaming: bool = False,
+            in_prompt_cache : dict = None,
         ) -> Generator[np.ndarray, None, None]:
         """Synthesize speech for the given text and return a single waveform.
 
@@ -196,10 +197,13 @@ class VoxCPM:
                         temp_prompt_wav_path = tmp_file.name
                     self.denoiser.enhance(prompt_wav_path, output_path=temp_prompt_wav_path)
                     prompt_wav_path = temp_prompt_wav_path
-                fixed_prompt_cache = self.tts_model.build_prompt_cache(
-                    prompt_wav_path=prompt_wav_path,
-                    prompt_text=prompt_text
-                )
+                if in_prompt_cache:
+                    fixed_prompt_cache = in_prompt_cache
+                else:
+                    fixed_prompt_cache = self.tts_model.build_prompt_cache(
+                        prompt_wav_path=prompt_wav_path,
+                        prompt_text=prompt_text
+                    )
             else:
                 fixed_prompt_cache = None  # will be built from the first inference
             

@@ -9,6 +9,10 @@ import soundfile as sf
 import numpy as np
 from voxcpm import VoxCPM
 
+from chh.ebook import split_text_by_length
+from chh.prompts import prompts as g_prompts
+from chh.book_reader import read_book, read_txt_speaker_paragraphs
+
 # print("PyTorch version:", torch.__version__)
 # print("Torchaudio version:", torchaudio.__version__)
 # # print("Torch-complex version:", torch_complex.__version__)
@@ -17,7 +21,6 @@ from voxcpm import VoxCPM
 #     print("CUDA device:", torch.cuda.get_device_name(0))
 #     print("CUDA version (runtime):", torch.version.cuda)
 
-from chh_prompts import prompts as g_prompts
 
 def save_waves(filename, waves, sample_rate):
     
@@ -62,56 +65,55 @@ def inference_zero_shot(model, txt_contents, prompts, dstwav):
         # print("speaker_name:", speaker_name)
         # print("text:", text)
 
-        wav = model.generate(
-            text=text,
-            prompt_wav_path=cur_speaker['prompt_wav'],      # optional: path to a prompt speech for voice cloning
-            prompt_text=cur_speaker['prompt_text'],          # optional: reference text
-            cfg_value=2.0,             # LM guidance on LocDiT, higher for better adherence to the prompt, but maybe worse
-            inference_timesteps=10,   # LocDiT inference timesteps, higher for better result, lower for fast speed
-            normalize=False,           # enable external TN tool, but will disable native raw text support
-            denoise=False,             # enable external Denoise tool, but it may cause some distortion and restrict the sampling rate to 16kHz
-            retry_badcase=True,        # enable retrying mode for some bad cases (unstoppable)
-            retry_badcase_max_times=3,  # maximum retrying times
-            retry_badcase_ratio_threshold=6.0, # maximum length restriction for bad case detection (simple but effective), it could be adjusted for slow pace speech
-        )
-        waves.append(wav)            
+        segments = split_text_by_length(text, 512)
+        for txt_segment in segments:
+            wav = model.generate(
+                text=txt_segment,
+                prompt_wav_path=cur_speaker['prompt_wav'],      # optional: path to a prompt speech for voice cloning
+                prompt_text=cur_speaker['prompt_text'],          # optional: reference text
+                in_prompt_cache = cur_speaker['prompt_cache'],
+                cfg_value=2.0,             # LM guidance on LocDiT, higher for better adherence to the prompt, but maybe worse
+                inference_timesteps=10,   # LocDiT inference timesteps, higher for better result, lower for fast speed
+                normalize=True,           # enable external TN tool, but will disable native raw text support
+                denoise=False,             # enable external Denoise tool, but it may cause some distortion and restrict the sampling rate to 16kHz
+                retry_badcase=True,        # enable retrying mode for some bad cases (unstoppable)
+                retry_badcase_max_times=3,  # maximum retrying times
+                retry_badcase_ratio_threshold=6.0, # maximum length restriction for bad case detection (simple but effective), it could be adjusted for slow pace speech
+            )
+            waves.append(wav)            
 
     save_waves(dstwav, waves, model.tts_model.sample_rate)   
 
-def read_txt_speaker_paragraphs(file_path):
-    """
-    读取 TXT 文件，将段落按 speaker 
-    """
-    paragraphs = []
-    speaker_pattern = re.compile(r'^Speaker\s*\S*:')  # 匹配 Speaker namexxx:
 
-    with open(file_path, "r", encoding="utf-8-sig") as f:
-        noSpeaker = []
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue  # 忽略空行
-
-            if speaker_pattern.match(line):
-                if len(noSpeaker) > 0:
-                    paragraphs.append("。".join(noSpeaker))
-                # 新段落
-                paragraphs.append(line)
-                noSpeaker = []
-            else:
-                noSpeaker.append(line)
-
-        if len(noSpeaker) > 0:
-            paragraphs.append("。".join(noSpeaker))
-
-    return paragraphs
-
-
-def voxcpm_example():
+def initVoxCPM():
     model = VoxCPM.from_pretrained(hf_model_id = "./chh/pretrained_models/VoxCPM1.5", 
                                     zipenhancer_model_id = "./chh/modelscope/speech_zipenhancer_ans_multiloss_16k_base",
                                     # optimize = False,
                                     local_files_only = True)
+    
+    # 增加缓存
+    for key, value in g_prompts.items():
+        value['prompt_cache'] = model.tts_model.build_prompt_cache(value['prompt_text'], value['prompt_wav'])
+    
+    return model
+    
+# 合成小说 
+def inference_book(txt_path, wav_path, chapter_idx = 0):
+  
+    chapters = read_book(txt_path, wav_path, chapter_idx)
+    # 目录方式
+    if len(chapters) < 1:
+        return
+
+    model = initVoxCPM()
+
+    # 合成
+    for chapter in chapters:
+        inference_zero_shot(model, chapter['contents'], g_prompts, chapter['wav'])
+    
+    
+def voxcpm_example():
+    model = initVoxCPM()
 
     # Non-streaming
     # wav = model.generate(
@@ -130,11 +132,12 @@ def voxcpm_example():
     # sf.write("output.wav", wav, model.tts_model.sample_rate)
     # print("saved: output.wav")
 
-    txt_contents = read_txt_speaker_paragraphs("./chh/books/1996 终极实验 - 罗伯特·索耶 - fix/0004.1996 终极实验 - 罗伯特·索耶.引子.txt")
-    inference_zero_shot(model, txt_contents, g_prompts, './chh/output/1996 终极实验 - 罗伯特·索耶/0004.引子.wav')
+    txt_contents = read_txt_speaker_paragraphs("./chh/books/终极实验/0004.终极实验.引子.txt")
+    inference_zero_shot(model, txt_contents, g_prompts, './chh/output/终极实验/0004.终极实验.引子.wav')
 
 def main():
-    voxcpm_example()
+    # voxcpm_example()
+    inference_book('./chh/books/终极实验/', './chh/output/终极实验/')
 
 
 if __name__ == '__main__':
