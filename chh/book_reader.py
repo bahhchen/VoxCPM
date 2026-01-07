@@ -13,6 +13,8 @@ def read_txt_speaker_paragraphs(file_path):
         noSpeaker = []
         for line in f:
             line = line.strip()
+            if line == '---end---':
+                break
             if not line:
                 continue  # 忽略空行
 
@@ -31,7 +33,7 @@ def read_txt_speaker_paragraphs(file_path):
     return paragraphs
 
 # 读取小说 
-def read_book(txt_path, wav_path, chapter = 0):
+def read_book(txt_path, wav_path, chapter = 0, chapter2 = 0xfffffff):
   
     books = []
 
@@ -41,9 +43,12 @@ def read_book(txt_path, wav_path, chapter = 0):
 
     filelist = os.listdir(txt_path)
     for i, file_name in enumerate(filelist):
+        if i >= chapter2:
+            break
         # print(f"文件名： {i}:{file_name}")
         if i < chapter:
             continue
+       
         name_without_ext = os.path.splitext(file_name)[0]
         wav_filename = os.path.join(wav_path, f"{name_without_ext}.wav")
         if os.path.exists(wav_filename):

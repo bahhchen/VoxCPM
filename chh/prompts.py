@@ -7,7 +7,8 @@ prompts = {
     },
     'YM_woman' :{ # 杨幂
         'prompt_wav' : './chh/assets/zh-YM_woman.wav',
-        'prompt_text' : '我醒来时，看见了那个男孩子，他看着我，我想起了和他一起，在养老院晒洗床单的时光。'
+        # 'prompt_text' : '我醒来时，看见了那个男孩子，他看着我，我想起了和他一起，在养老院晒洗床单的时光。'
+        'prompt_text' : '人生只有一次啊，你怎么知道那样选你当下来说应该那样选，为什么没那样选呢？但你今天这要选了呀！'
     },
     "zlc_woman":{ # 赵露思
         'prompt_wav' : './chh/assets/zh-zlc_woman.wav',
@@ -15,7 +16,27 @@ prompts = {
     },
     "dlrb_woman":{ # 迪丽热巴
         'prompt_wav' : './chh/assets/zh-dlrb_woman.wav',
-        'prompt_text' : '因为从这些小朋友身上看到了当年自己的影子，也包括他们每一个人离开时的样子。'
+        'prompt_text' : '就像你脚下走的路一样，都要一步一步走出来的，所以我觉得可能，有一步你可能没有踏出来，或者说是你，在原地，呆住了。'
+    },
+    "zly_woman":{ # 赵丽颖 
+        'prompt_wav' : './chh/assets/zh-zly_woman.wav',
+        'prompt_text' : '满意的不能再满意了，过了一个，炎热的夏天，然后演了一个，比较帅比较潇洒，但是，又带了一点，呆萌可爱的角色。'
+    },
+    "fbb_woman":{ # 范冰冰 
+        'prompt_wav' : './chh/assets/zh-fbb_woman.wav',
+        'prompt_text' : '在你还一个非常好的年纪里面，然后你去感受这个世界跟你的一个连接。'
+    },
+    "zyq_woman":{ # 张雨绮 
+        'prompt_wav' : './chh/assets/zh-zyq_woman.wav',
+        'prompt_text' : '你决定好了，你该买什么的东西你就决定好了，该什么，就我特别喜欢依赖这方面的事情，我不自己特别有主见或者什么，就因为我大家都开心。'
+    },
+    "zta_woman":{ # 张天爱 
+        'prompt_wav' : './chh/assets/zh-zta_woman.wav',
+        'prompt_text' : '我手机就响了，有一个座机的电话，就给我打过来，然后就说，但我没有存这个座机号。'
+    },
+    "bl_woman":{ # 白鹿 
+        'prompt_wav' : './chh/assets/zh-bl_woman.wav',
+        'prompt_text' : '我最喜欢的是我前期就是有两个辫子的时候，然后，我有去参加一个游园会，然后那身衣服，还不是我的，是别人借给我的，但那身衣服特别好看。'
     },
 
     'Xinran_woman':{
@@ -53,6 +74,23 @@ prompts = {
         'prompt_wav' : './chh/assets/zh-st_man.wav',
         'prompt_text' : '剧情就是我饰演的，叫王多鱼，他是一个三四线城市，就是咱们说的西虹市。'
     },
+    "wl_man":{ # 吴磊
+        'prompt_wav' : './chh/assets/zh-wl_man.wav',
+        'prompt_text' : '网球吧，是一个浪漫的运动，它就是跟人间四季，风雪雨晴息息相关。'
+    },
+    "ldh_man":{ # 刘德华
+        'prompt_wav' : './chh/assets/zh-ldh_man.wav',
+        'prompt_text' : '所以不是说我离开就是成功，留下来那个人也成功。所以每人，每一个人的路都不一样，但是，有一样事情是不能缺的，就是努力。'
+    },
+    "hb_man":{ # 黄渤
+        'prompt_wav' : './chh/assets/zh-hb_man.wav',
+        'prompt_text' : '你开始知道的时候当然是震惊的，你，不好接受的。但后来其实最无奈的是，它并没有那么好特效药，并不是说住院住上半年就，就好了的。'
+    },
+    "zjl_man":{ # 周杰伦
+        'prompt_wav' : './chh/assets/zh-zjl_man.wav',
+        'prompt_text' : '这些MV呢，其实都是一个经验。为什么？因为我想当导演，所以我不断在练习，这MV当中有好的有不好的。'
+    },
+    
 }
 
 import re
