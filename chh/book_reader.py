@@ -2,18 +2,20 @@
 import re
 import os
 
-def read_txt_speaker_paragraphs(file_path):
+def read_txt_speaker_paragraphs(file_path, end):
     """
     读取 TXT 文件，将段落按 speaker 
     """
     paragraphs = []
     speaker_pattern = re.compile(r'^Speaker\s*\S*:')  # 匹配 Speaker namexxx:
 
+    isend = False
     with open(file_path, "r", encoding="utf-8-sig") as f:
         noSpeaker = []
         for line in f:
             line = line.strip()
-            if line == '---end---':
+            if end and line == end:
+                isend = True
                 break
             if not line:
                 continue  # 忽略空行
@@ -30,10 +32,10 @@ def read_txt_speaker_paragraphs(file_path):
         if len(noSpeaker) > 0:
             paragraphs.append("。".join(noSpeaker))
 
-    return paragraphs
+    return paragraphs if ((not end) or isend) else None
 
 # 读取小说 
-def read_book(txt_path, wav_path, chapter = 0, chapter2 = 0xfffffff):
+def read_book(txt_path, wav_path, chapter = 0, end = None):
   
     books = []
 
@@ -43,8 +45,6 @@ def read_book(txt_path, wav_path, chapter = 0, chapter2 = 0xfffffff):
 
     filelist = os.listdir(txt_path)
     for i, file_name in enumerate(filelist):
-        if i >= chapter2:
-            break
         # print(f"文件名： {i}:{file_name}")
         if i < chapter:
             continue
@@ -55,7 +55,9 @@ def read_book(txt_path, wav_path, chapter = 0, chapter2 = 0xfffffff):
             continue
 
         txt_filename = os.path.join(txt_path, file_name)
-        txt_contents = read_txt_speaker_paragraphs(txt_filename)
+        txt_contents = read_txt_speaker_paragraphs(txt_filename, end)
+        if txt_contents == None:
+            break
         books.append({"contents": txt_contents, "wav": wav_filename})
 
     return books

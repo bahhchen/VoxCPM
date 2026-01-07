@@ -67,7 +67,20 @@ def inference_zero_shot(model, txt_contents, prompts, dstwav):
 
         segments = split_text_by_length(text, 512)
         for txt_segment in segments:
-            wav = model.generate(
+            # wav = model.generate(
+            #     text=txt_segment,
+            #     prompt_wav_path=cur_speaker['prompt_wav'],      # optional: path to a prompt speech for voice cloning
+            #     prompt_text=cur_speaker['prompt_text'],          # optional: reference text
+            #     in_prompt_cache = cur_speaker['prompt_cache'],
+            #     cfg_value=2.0,             # LM guidance on LocDiT, higher for better adherence to the prompt, but maybe worse
+            #     inference_timesteps=10,   # LocDiT inference timesteps, higher for better result, lower for fast speed
+            #     normalize=True,           # enable external TN tool, but will disable native raw text support
+            #     denoise=False,             # enable external Denoise tool, but it may cause some distortion and restrict the sampling rate to 16kHz
+            #     retry_badcase=True,        # enable retrying mode for some bad cases (unstoppable)
+            #     retry_badcase_max_times=3,  # maximum retrying times
+            #     retry_badcase_ratio_threshold=6.0, # maximum length restriction for bad case detection (simple but effective), it could be adjusted for slow pace speech
+            # )
+            for chunk in model.generate_streaming(
                 text=txt_segment,
                 prompt_wav_path=cur_speaker['prompt_wav'],      # optional: path to a prompt speech for voice cloning
                 prompt_text=cur_speaker['prompt_text'],          # optional: reference text
@@ -76,11 +89,12 @@ def inference_zero_shot(model, txt_contents, prompts, dstwav):
                 inference_timesteps=10,   # LocDiT inference timesteps, higher for better result, lower for fast speed
                 normalize=True,           # enable external TN tool, but will disable native raw text support
                 denoise=False,             # enable external Denoise tool, but it may cause some distortion and restrict the sampling rate to 16kHz
-                retry_badcase=True,        # enable retrying mode for some bad cases (unstoppable)
+                retry_badcase=False,        # enable retrying mode for some bad cases (unstoppable)
                 retry_badcase_max_times=3,  # maximum retrying times
                 retry_badcase_ratio_threshold=6.0, # maximum length restriction for bad case detection (simple but effective), it could be adjusted for slow pace speech
-            )
-            waves.append(wav)            
+            ):
+                waves.append(chunk)
+            # waves.append(wav)            
 
     save_waves(dstwav, waves, model.tts_model.sample_rate)   
 
@@ -98,9 +112,9 @@ def initVoxCPM():
     return model
     
 # 合成小说 
-def inference_book(txt_path, wav_path, chapter_idx = 0):
+def inference_book(txt_path, wav_path, chapter_idx = 0, end = '---end---'):
   
-    chapters = read_book(txt_path, wav_path, chapter_idx)
+    chapters = read_book(txt_path, wav_path, chapter_idx, end)
     # 目录方式
     if len(chapters) < 1:
         return
