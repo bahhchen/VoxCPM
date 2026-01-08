@@ -2,6 +2,45 @@
 import re
 import os
 
+
+# 中文标点 -> 英文标点映射
+punct_map = {
+    # '，': ',',
+    # '。': '.',
+    # '！': '!',
+    # '？': '?',
+    # '：': ':',
+    # '；': ';',
+    # '（': '(',
+    # '）': ')',
+    '【': '[',
+    '】': ']',
+    '·':'-'
+    # '“': '"',
+    # '”': '"',
+    # '‘': "'",
+    # '’': "'",
+    # '、': ',',
+    # '《': '<',
+    # '》': '>',
+}
+
+# 特殊情况: "——" 和 "…" 需要单独处理
+def normalize_punctuation(text: str) -> str:
+    # 先替换多字符标点
+    # text = text.replace("——", "--").replace("…", "...")
+    text = text.replace("……", "，")
+    text = text.replace("…", "，")
+    
+    # 单字符映射用 translate
+    # trans_table = str.maketrans(punct_map)
+    # text = text.translate(trans_table)
+
+    # 删除非中英文和数字的字符，替换为空格
+    # text = re.sub(r"[^\u4e00-\u9fa5a-zA-Z0-9\s\.,!?;:()\-—\"'<>]", " ", text)
+
+    return text
+
 def read_txt_speaker_paragraphs(file_path, end):
     """
     读取 TXT 文件，将段落按 speaker 
@@ -20,17 +59,19 @@ def read_txt_speaker_paragraphs(file_path, end):
             if not line:
                 continue  # 忽略空行
 
-            if speaker_pattern.match(line):
+            nortext = normalize_punctuation(line)
+
+            if speaker_pattern.match(nortext):
                 if len(noSpeaker) > 0:
-                    paragraphs.append("。".join(noSpeaker))
+                    paragraphs.append(" ".join(noSpeaker))
                 # 新段落
-                paragraphs.append(line)
+                paragraphs.append(nortext)
                 noSpeaker = []
             else:
-                noSpeaker.append(line)
+                noSpeaker.append(nortext)
 
         if len(noSpeaker) > 0:
-            paragraphs.append("。".join(noSpeaker))
+            paragraphs.append(" ".join(noSpeaker))
 
     return paragraphs if ((not end) or isend) else None
 

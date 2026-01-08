@@ -27,42 +27,6 @@ def is_bad_text(text: str) -> bool:
             return True
     return False
 
-
-# 中文标点 -> 英文标点映射
-punct_map = {
-    '，': ',',
-    '。': '.',
-    '！': '!',
-    '？': '?',
-    '：': ':',
-    '；': ';',
-    '（': '(',
-    '）': ')',
-    '【': '[',
-    '】': ']',
-    '“': '"',
-    '”': '"',
-    '‘': "'",
-    '’': "'",
-    '、': ',',
-    '《': '<',
-    '》': '>',
-}
-
-# 特殊情况: "——" 和 "…" 需要单独处理
-def normalize_punctuation(text: str) -> str:
-    # 先替换多字符标点
-    text = text.replace("——", "--").replace("…", "...")
-    
-    # 单字符映射用 translate
-    trans_table = str.maketrans(punct_map)
-    text = text.translate(trans_table)
-
-    # 删除非中英文和数字的字符，替换为空格
-    text = re.sub(r"[^\u4e00-\u9fa5a-zA-Z0-9\s\.,!?;:()\-—\"'<>]", " ", text)
-
-    return text
-
 def read_epub(file_path):
     """解析 EPUB，按章节输出，返回 chapters 列表，每个元素为 (title, content)"""
     book = epub.read_epub(file_path)
@@ -236,7 +200,7 @@ def split_text_by_length(text, max_len=7200):
             if newline_pos != -1:
                 split_pos = newline_pos + 1  # 包含换行符
             else:
-                newline_pos = text.rfind("。", 0, split_pos)
+                newline_pos = text.rfind(" ", 0, split_pos)
                 if newline_pos != -1:
                     split_pos = newline_pos + 1  # 包含换行符
         
