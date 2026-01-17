@@ -16,7 +16,7 @@ prompts = {
     },
     "dlrb_woman":{ # 迪丽热巴
         'prompt_wav' : './chh/assets/zh-dlrb_woman.wav',
-        'prompt_text' : '就像你脚下走的路一样，都要一步一步走出来的，所以我觉得可能，有一步你可能没有踏出来，或者说是你，在原地，呆住了。'
+        'prompt_text' : '要看自己怎么去看待吧，我觉得。对，就是有的人会觉得，唉，我漂亮所以我可以怎么怎么样，会有这种想法。'
     },
     "zly_woman":{ # 赵丽颖 
         'prompt_wav' : './chh/assets/zh-zly_woman.wav',
@@ -80,11 +80,11 @@ prompts = {
     },
     "ldh_man":{ # 刘德华
         'prompt_wav' : './chh/assets/zh-ldh_man.wav',
-        'prompt_text' : '所以不是说我离开就是成功，留下来那个人也成功。所以每人，每一个人的路都不一样，但是，有一样事情是不能缺的，就是努力。'
+        'prompt_text' : '我刚刚踏入演艺圈的一个训练班，我那个时候，已经有一个，在一起的女朋友，三年多了。'
     },
     "hb_man":{ # 黄渤
         'prompt_wav' : './chh/assets/zh-hb_man.wav',
-        'prompt_text' : '你开始知道的时候当然是震惊的，你，不好接受的。但后来其实最无奈的是，它并没有那么好特效药，并不是说住院住上半年就，就好了的。'
+        'prompt_text' : '有个颜值比我还低的年轻后生，拿着一好项目找赵天龙投资，他没投。'
     },
     "zjl_man":{ # 周杰伦
         'prompt_wav' : './chh/assets/zh-zjl_man.wav',

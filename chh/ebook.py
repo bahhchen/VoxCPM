@@ -219,6 +219,21 @@ def safe_filename(name: str) -> str:
         name = name.replace(ch, '-')
     return name.strip()
 
+def fullwidth_to_halfwidth(text: str) -> str:
+    """
+    将全角字符（字母 / 数字 / 常见符号）转换为半角
+    """
+    result = []
+    for ch in text:
+        code = ord(ch)
+        # 全角空格
+        if code == 0x3000:
+            code = 0x20
+        # 全角字符（！到～）
+        elif 0xFF01 <= code <= 0xFF5E:
+            code -= 0xFEE0
+        result.append(chr(code))
+    return ''.join(result)
 
 def to_txt(file_path, txt_dir):
 
@@ -254,7 +269,7 @@ def to_txt(file_path, txt_dir):
         #     continue
 
         # 替换文本
-        text = content.replace("○", "零")
+        text = fullwidth_to_halfwidth(content.replace("○", "零"))
         
         safe_title = safe_filename(title)
         segments = [] #split_text_by_length(text)

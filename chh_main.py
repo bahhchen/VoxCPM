@@ -41,7 +41,7 @@ def save_waves(filename, waves, sample_rate):
         sample_rate
     )
 
-def inference_zero_shot(model, txt_contents, prompts, dstwav, steps = 10):
+def inference_zero_shot(model, txt_contents, prompts, dstwav, isprompt = False, steps = 10):
     waves = []
 
     prompts_key0 = next(iter(prompts))
@@ -69,10 +69,13 @@ def inference_zero_shot(model, txt_contents, prompts, dstwav, steps = 10):
         # print("speaker_name:", speaker_name)
         # print("text:", text)
 
-        segments = split_text_by_length(text, 512)
+        segments = split_text_by_length(text, 128)
         for txt_segment in segments:
             print(f"INFO synthesis text：{txt_segment}")
-            cur_speaker = prompts['s_' + speaker_name] if len(txt_segment) <= 6 else prompts['l_' + speaker_name]
+            if isprompt:
+                cur_speaker = prompts[speaker_name]
+            else : 
+                cur_speaker = prompts['s_' + speaker_name] if len(txt_segment) <= 6 else prompts['l_' + speaker_name]
             wav = model.generate(
                 text=txt_segment,
                 prompt_wav_path=cur_speaker['prompt_wav'],      # optional: path to a prompt speech for voice cloning
@@ -134,27 +137,32 @@ def inference_book(txt_path, wav_path, chapter_idx = 0, end = '---end---'):
     
 # 生成提示音
 def inference_prompt(model, name, lcontent, scontent):
-    txt_contents =[
-        'Speaker '+name+':于是，我说道：'+lcontent,
-    ]
-    lwav = './chh/assets2/zh-l_' + name +'.wav'
-    inference_zero_shot(model, txt_contents, g_prompts, lwav, steps=30)
-     
-    txt_contents =[
-        'Speaker '+name+':于是，我说道：'+scontent,
-    ]
-    swav = './chh/assets2/zh-s_' + name +'.wav'
-    inference_zero_shot(model, txt_contents, g_prompts, swav, steps=30)
-
     res = {}
-    res['l_' + name] = {
-        'prompt_wav' : lwav,
-        'prompt_text' : lcontent,
-    }
-    res['s_' + name] = {
-        'prompt_wav' : swav,
-        'prompt_text' : scontent,
-    }
+    if lcontent != None:
+        txt_contents =[
+            # 'Speaker '+name+':于是，我说道：'+lcontent,
+            'Speaker '+name+':'+lcontent,
+        ]
+        lwav = './chh/assets2/zh-l_' + name +'.wav'
+        inference_zero_shot(model, txt_contents, g_prompts, lwav, isprompt = True, steps=10)
+
+        res['l_' + name] = {
+            'prompt_wav' : lwav,
+            'prompt_text' : lcontent,
+        }
+     
+    if scontent != None:
+        txt_contents =[
+            # 'Speaker '+name+':于是，我说道：'+scontent,
+            'Speaker '+name+':'+scontent,
+        ]
+        swav = './chh/assets2/zh-s_' + name +'.wav'
+        inference_zero_shot(model, txt_contents, g_prompts, swav, isprompt = True, steps=10)
+
+        res['s_' + name] = {
+            'prompt_wav' : swav,
+            'prompt_text' : scontent,
+        }
     print("res:", json.dumps(res, ensure_ascii=False, indent=4))
 
 
@@ -187,23 +195,33 @@ def voxcpm_example():
         'Speaker s_ldh_man:走',
         'Speaker s_hb_man:滚',
     ]
-    if 1:
+    if 0:
         inference_zero_shot(model, txt_contents, g_prompts, './chh/output/test.wav')
     else :
+        print("inference_prompt")
+        # inference_prompt(model, 'ZL2_woman', '河边的柳树轻轻摇曳，水面倒映出蓝天和白云，景色如画令人心旷神怡。', '小猫在草地玩耍。')
+        # inference_prompt(model, 'YM_woman', '在图书馆里，阳光洒在书页上，空气中弥漫着淡淡的书香，令人沉浸其中。', '雨滴落在屋檐。')
+        # inference_prompt(model, 'zlc_woman', '海边的浪花拍打着岩石，海风带着咸味吹拂脸庞，天空和海面交相辉映。', '河水轻轻流动。')
+        # inference_prompt(model, 'dlrb_woman', '古老的庭院中，石阶上落满枯叶，微风吹动，远处传来悠扬的鸟鸣声。', '微风吹拂脸庞。')
         # inference_prompt(model, 'zly_woman', '公车缓缓驶过街道，窗外景物像电影镜头般掠过，乘客安静地坐在座位上。', '我站在天桥上。')
         # inference_prompt(model, 'fbb_woman', '秋天的树林里，落叶铺满小径，踩上去发出沙沙声，空气中带着淡淡的泥土香。', '切换到夜间模式。')
+        # inference_prompt(model, 'zyq_woman', '夜晚的城市灯火辉煌，街道上偶尔传来车辆低沉的引擎声，微风拂过脸庞。', '鸟儿飞过蓝天。')
+        # inference_prompt(model, 'zta_woman', '清晨的公园里，跑步的人们穿梭在绿荫小道上，鸟鸣声和笑声交织在空气中。', '风铃随风作响。')
         # inference_prompt(model, 'bl_woman', '清晨的市场熙熙攘攘，叫卖声、讨价声此起彼伏，生活气息充满街头巷尾。', '给我讲个故事。')
-        # inference_prompt(model, 'wyb_man', '山间小路蜿蜒曲折，溪水潺潺流淌，林间充满清新的泥土气息和鸟鸣声。', '花园里开满鲜花。')
-        # inference_prompt(model, 'zlc_man', '在海滩上，孩子们堆沙堡、追逐嬉戏，海浪拍打岸边发出悦耳的节奏声。', '孩子们在院子跑。')
-        # inference_prompt(model, 'xz_man', '清晨阳光透过薄雾洒在湖面上，水波荡漾，倒映出远山和飞鸟的剪影。', '公园里人影稀疏。')
-        # inference_prompt(model, 'st_man', '河边垂钓的人静静坐着，偶尔抛出钓竿，水面泛起微微涟漪，宁静而悠闲。', '小河潺潺流淌。')
-        inference_prompt(model, 'lcw_man', '夜晚的咖啡馆里，轻柔的音乐伴随咖啡香，窗外路灯闪烁，行人匆匆而过。', '太阳落山了。')
-        # inference_prompt(model, 'zjl_man', '小河弯弯曲曲流向远方，水草随波摇曳，鱼儿偶尔跃出水面，微风吹动水面泛光。', '雪花飘落街道。')
+
+        # inference_prompt(model, 'wyb_man', "山间小路蜿蜒曲折，溪水潺潺流淌，林间充满清新的泥土气息和鸟鸣声。", '花园里开满鲜花。')
+        # inference_prompt(model, 'zlc_man', "在海滩上，孩子们堆沙堡、追逐嬉戏，海浪拍打岸边发出悦耳的节奏声。", '孩子们在院子跑。')
+        # inference_prompt(model, 'xz_man', "清晨阳光透过薄雾洒在湖面上，水波荡漾，倒映出远山和飞鸟的剪影。", '公园里人影稀疏。')
+        # inference_prompt(model, 'st_man', "河边垂钓的人静静坐着，偶尔抛出钓竿，水面泛起微微涟漪，宁静而悠闲。", '小河潺潺流淌。')
+        # inference_prompt(model, 'lcw_man', "夜晚的咖啡馆里，轻柔的音乐伴随咖啡香，窗外路灯闪烁，行人匆匆而过。", '太阳落山了。')
+        # inference_prompt(model, 'ldh_man', "小镇的街道安静而宁和，远处传来钟声，孩子们在院子里嬉笑玩耍。", '阳光洒在窗台。')
+        # inference_prompt(model, 'zjl_man', "小河弯弯曲曲流向远方，水草随波摇曳，鱼儿偶尔跃出水面，微风吹动水面泛光。", '雪花飘落街道。')
+        # inference_prompt(model, 'hb_man', "天空中飘着几片白云，微风轻轻吹过河面，波光闪烁着温柔的光。", '风吹过湖面。')
     
 
 def main():
-    # voxcpm_example()
-    inference_book('./chh/books/终极实验/', './chh/output/终极实验/')
+    voxcpm_example()
+    # inference_book('./chh/books/终极实验/', './chh/output/终极实验/')
 
 
 if __name__ == '__main__':
